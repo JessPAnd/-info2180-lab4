@@ -1,4 +1,5 @@
 <?php
+header("Access-Control-Allow-Origin: *");
 
 $superheroes = [
   [
@@ -63,10 +64,26 @@ $superheroes = [
   ], 
 ];
 
-?>
+$query = filter_input(INPUT_GET, 'query', FILTER_SANITIZE_STRING); 
 
-<ul>
-<?php foreach ($superheroes as $superhero): ?>
-  <li><?= $superhero['alias']; ?></li>
-<?php endforeach; ?>
-</ul>
+if ($query && strlen($query) >= 3) 
+{
+    $result = array_filter($superheroes, function($superhero) use ($query) {
+        return stripos($superhero['name'], $query) !== false || stripos($superhero['alias'], $query) !== false;
+    });
+
+    if (count($result) > 0) {
+        foreach($result as $superhero) {
+            echo $superhero['name'] . "|||" . $superhero['alias'] . "|||" . $superhero['biography'];
+        }
+    } else {
+        echo "Superhero not found";
+    }
+} else {
+    echo "<ul>";
+    foreach($superheroes as $superhero) {
+        echo "<li>" . $superhero['alias'] . "</li>";
+    }
+    echo "</ul>";
+}
+
